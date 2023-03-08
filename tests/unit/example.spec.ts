@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import HomePage from '@/views/LoginPage.vue'
+import HomePage from '@/views/HomePage.vue'
 
 describe('HomePage.vue', () => {
   it('renders home vue', () => {
