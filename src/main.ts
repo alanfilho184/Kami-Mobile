@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import { Storage } from '@ionic/storage';
 
 import { IonicVue } from '@ionic/vue';
 
@@ -22,11 +23,20 @@ import '@ionic/vue/css/typography.css';
 
 /* Theme variables */
 import './theme/variables.css';
+const storagePlugin = {
+  install: async (app: any) => {
+    const store = new Storage();
+    const storage = await store.create();
+
+    app.config.globalProperties.$storage = storage;
+  }
+};
 
 const app = createApp(App)
   .use(IonicVue)
+  .use(storagePlugin)
   .use(router);
-  
+
 router.isReady().then(() => {
   app.mount('#app');
 });

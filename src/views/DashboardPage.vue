@@ -1,19 +1,37 @@
 
-<script setup lang="ts">
+<script>
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+
+export default {
+  components: {
+    IonContent,
+    IonHeader,
+    IonPage,
+    IonTitle,
+    IonToolbar,
+  },
+  async beforeMount() {
+    const token = await this.$storage.get('token')
+
+    if (token == null) {
+      await this.$storage.remove('user')
+      this.$router.push({ name: 'Home' })
+    }
+  },
+}
 </script>
 
 <template>
   <ion-page>
     <ion-header class="header" collapse="condense">
       <ion-toolbar>
-        <ion-title size="large" class="header-title">Login</ion-title>
+        <ion-title size="large" class="header-title">Dashboard</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <div id="container">
-
+        <h1>{{ $route.name }}</h1>
       </div>
     </ion-content>
   </ion-page>
@@ -37,20 +55,6 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue
 
 .header-title {
   font-size: 1.5em;
-}
-
-.login-button {
-  margin: 10px;
-  background-color: var(--kami-primary);
-  color: var(--kami-text);
-  border-radius: 0.5em;
-  width: 80%;
-  height: 2.5em;
-  font-size: 1.2em;
-  font-weight: bold;
-}
-
-.login-button:active {
-  background-color: var(--kami-primary);
+  text-align: right;
 }
 </style>
