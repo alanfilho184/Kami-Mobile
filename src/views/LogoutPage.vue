@@ -8,6 +8,6 @@ export default {
 }
 </script>
 <template>
-    <div class="loading"></div>
+   <div id="Logout"></div>
 </template>
 <style></style>

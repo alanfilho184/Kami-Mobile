@@ -97,6 +97,7 @@ export default {
           await this.$storage.set('token', data.token)
           //socket.emit('login', { token: data.token })
 
+          this.makingLogin = false
           this.$router.push({ name: 'Dashboard' })
         }
         else if (response.status === 400) {

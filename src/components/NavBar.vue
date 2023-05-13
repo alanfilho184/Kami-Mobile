@@ -8,7 +8,10 @@ export default {
             userLoaded: false,
             user: {},
             signedRoute: false,
-            collapsed: false
+            collapsed: false,
+            isInHome: false
+
+
         }
     },
     methods: {
@@ -58,6 +61,13 @@ export default {
     },
     watch: {
         async $route() {
+            if (this.$route.name == 'Home') {
+                this.isInHome = true
+            }
+            else {
+                this.isInHome = false
+            }
+
             if (signedRoutes.includes(this.$route.name)) {
                 this.signedRoute = true
             }
@@ -66,9 +76,16 @@ export default {
             }
 
             await this.loadUser()
-        },
+        }
     },
     beforeMount() {
+        if (this.$route.name == 'Home') {
+            this.isInHome = true
+        }
+        else {
+            this.isInHome = false
+        }
+
         if (signedRoutes.includes(this.$route.name)) {
             this.signedRoute = true
         }
@@ -81,7 +98,7 @@ export default {
 }
 </script>
 <template>
-    <div id="nav-bar-mobile" ref="menu-mobile">
+    <div id="nav-bar-mobile" ref="menu-mobile" v-if="!isInHome">
         <div id="menu-toggle">
             <input type="checkbox" ref="menu-toggle" />
             <span></span>
