@@ -1,5 +1,5 @@
 <script>
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonTabs, IonRouterOutlet } from '@ionic/vue';
 import LoadWheel from '../components/LoadWheel.vue';
 import { useRouter } from 'vue-router';
 
@@ -11,6 +11,8 @@ export default {
     IonPage,
     IonTitle,
     IonToolbar,
+    IonTabs,
+    IonRouterOutlet,
     LoadWheel
   },
   data() {
@@ -296,96 +298,101 @@ export default {
 
 <template>
   <ion-page>
-    <ion-header class="header" collapse="condense">
-      <ion-toolbar>
-        <ion-title size="large" class="header-title">Entrar</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <ion-tabs>
+      <ion-router-outlet></ion-router-outlet>
+      <ion-header class="header" collapse="condense">
+        <ion-toolbar>
+          <ion-title size="large" class="header-title">Entrar</ion-title>
+        </ion-toolbar>
+      </ion-header>
 
-    <ion-content :fullscreen="true">
-      <div id="container">
-        <img src="../assets/logo.png" />
-        <div class="login-form" v-if="loginVisible">
-          <div class="login-header" v-if="!makingLogin && !loginError.state">
-            <h1>Acesse sua conta</h1>
-          </div>
-          <div class="login-header" v-else-if="makingLogin && !loginError.state">
-            <h1>Carregando...</h1>
-          </div>
-          <div class="login-header" v-else>
-            <h1>{{ loginError.message }}</h1>
-            <button @click="loginError.state = false; loginError.message = ''">Ok</button>
-          </div>
-          <div class="login-body" v-if=" !makingLogin && !loginError.state ">
-            <div class="login-item">
-              <label>Email</label>
-              <input type="email" ref="login-email" />
+      <ion-content :fullscreen="true">
+        <div id="container">
+          <img src="../assets/logo.png" />
+          <div class="login-form" v-if="loginVisible">
+            <div class="login-header" v-if="!makingLogin && !loginError.state">
+              <h1>Acesse sua conta</h1>
             </div>
-            <div class="login-item">
-              <label>Senha</label>
-              <input type="password" ref="login-password" />
+            <div class="login-header" v-else-if="makingLogin && !loginError.state">
+              <h1>Carregando...</h1>
             </div>
-            <div class="toggle-buttons">
-              <button @click=" makeLogin() ">Entrar</button>
-              <button @click=" toggleLogin() ">Voltar</button>
+            <div class="login-header" v-else>
+              <h1>{{ loginError.message }}</h1>
+              <button @click="loginError.state = false; loginError.message = ''">Ok</button>
             </div>
+            <div class="login-body" v-if="!makingLogin && !loginError.state">
+              <div class="login-item">
+                <label>Email</label>
+                <input type="email" ref="login-email" />
+              </div>
+              <div class="login-item">
+                <label>Senha</label>
+                <input type="password" ref="login-password" />
+              </div>
+              <div class="toggle-buttons">
+                <button @click=" makeLogin()">Entrar</button>
+                <button @click=" toggleLogin()">Voltar</button>
+              </div>
+            </div>
+            <LoadWheel v-else-if="makingLogin && !loginError.state" />
           </div>
-          <LoadWheel v-else-if=" makingLogin && !loginError.state " />
-        </div>
-        <div class="register-form" v-else-if=" registerVisible ">
-          <div class="register-header" v-if=" !registeringUser && !registerError.state && !registerSuccess ">
-            <h1>Crie sua conta</h1>
-          </div>
-          <div class="register-header" v-else-if=" registeringUser && !registerError.state && !registerSuccess ">
-            <h1>Carregando...</h1>
-          </div>
-          <div class="register-header" v-else-if=" !registeringUser && registerError.state && !registerSuccess ">
-            <h1>Erro ao criar conta</h1>
-            <p v-for="           error           in           registerError.errors           " :key=" error ">{{ error.message
+          <div class="register-form" v-else-if="registerVisible">
+            <div class="register-header" v-if="!registeringUser && !registerError.state && !registerSuccess">
+              <h1>Crie sua conta</h1>
+            </div>
+            <div class="register-header" v-else-if="registeringUser && !registerError.state && !registerSuccess">
+              <h1>Carregando...</h1>
+            </div>
+            <div class="register-header" v-else-if="!registeringUser && registerError.state && !registerSuccess">
+              <h1>Erro ao criar conta</h1>
+              <p v-for="           error           in           registerError.errors           " :key="error">{{
+                error.message
               }}
-            </p>
-            <button @click=" registerError.state = false; registerError.errors = [] ">Ok</button>
+              </p>
+              <button @click=" registerError.state = false; registerError.errors = []">Ok</button>
+            </div>
+            <div class="register-header" v-else-if="!registeringUser && !registerError.state && registerSuccess">
+              <h1>Conta criada com sucesso!</h1>
+              <button @click=" registerSuccess = false; registerVisible = false; loginVisible = true">Ok</button>
+            </div>
+            <div class="register-body" v-if="!registeringUser && !registerError.state && !registerSuccess">
+              <div class="register-item">
+                <label>Nome de usuário</label>
+                <input type="text" ref="register-username" @input=" validateUsername()"
+                  :value="registerTextValue.username" />
+                <p v-if="validationErrors.username.state">{{ validationErrors.username.actualMessage }}</p>
+              </div>
+              <div class="register-item">
+                <label>Email</label>
+                <input type="email" ref="register-email" @input=" validateEmail()" :value="registerTextValue.email" />
+                <p v-if="validationErrors.email.state">{{ validationErrors.email.actualMessage }}</p>
+              </div>
+              <div class="register-item">
+                <label>Senha</label>
+                <input type="password" ref="register-password" @input=" validatePassword()" />
+                <p v-if="validationErrors.password.state">{{ validationErrors.password.actualMessage }}</p>
+              </div>
+              <div class="register-item">
+                <label>Confirmar senha</label>
+                <input type="password" ref="register-confirm-password" @input=" validateConfirmPassword()" />
+                <p v-if="validationErrors.confirmPassword.state">{{ validationErrors.confirmPassword.actualMessage }}
+                </p>
+              </div>
+              <div class="toggle-buttons">
+                <button @click=" toggleRegister()">Voltar</button>
+                <button @click=" registerUser()">Criar conta</button>
+              </div>
+            </div>
+            <LoadWheel v-else-if="registeringUser && !registerError.state && !registerSuccess" />
           </div>
-          <div class="register-header" v-else-if=" !registeringUser && !registerError.state && registerSuccess ">
-            <h1>Conta criada com sucesso!</h1>
-            <button @click=" registerSuccess = false; registerVisible = false; loginVisible = true ">Ok</button>
+          <div class="toggle-buttons" v-else>
+            <button @click=" toggleLogin()">Entrar</button>
+            <button @click=" toggleRegister()">Criar nova conta</button>
+            <p>Utilize uma conta para que possamos guardar suas fichas, campanhas e etc</p>
           </div>
-          <div class="register-body" v-if=" !registeringUser && !registerError.state && !registerSuccess ">
-            <div class="register-item">
-              <label>Nome de usuário</label>
-              <input type="text" ref="register-username" @input=" validateUsername() "
-                :value=" registerTextValue.username " />
-              <p v-if=" validationErrors.username.state ">{{ validationErrors.username.actualMessage }}</p>
-            </div>
-            <div class="register-item">
-              <label>Email</label>
-              <input type="email" ref="register-email" @input=" validateEmail() " :value=" registerTextValue.email " />
-              <p v-if=" validationErrors.email.state ">{{ validationErrors.email.actualMessage }}</p>
-            </div>
-            <div class="register-item">
-              <label>Senha</label>
-              <input type="password" ref="register-password" @input=" validatePassword() " />
-              <p v-if=" validationErrors.password.state ">{{ validationErrors.password.actualMessage }}</p>
-            </div>
-            <div class="register-item">
-              <label>Confirmar senha</label>
-              <input type="password" ref="register-confirm-password" @input=" validateConfirmPassword() " />
-              <p v-if=" validationErrors.confirmPassword.state ">{{ validationErrors.confirmPassword.actualMessage }}</p>
-            </div>
-            <div class="toggle-buttons">
-              <button @click=" toggleRegister() ">Voltar</button>
-              <button @click=" registerUser() ">Criar conta</button>
-            </div>
-          </div>
-          <LoadWheel v-else-if=" registeringUser && !registerError.state && !registerSuccess " />
         </div>
-        <div class="toggle-buttons" v-else>
-          <button @click=" toggleLogin() ">Entrar</button>
-          <button @click=" toggleRegister() ">Criar nova conta</button>
-          <p>Utilize uma conta para que possamos guardar suas fichas, campanhas e etc</p>
-        </div>
-      </div>
-    </ion-content>
+      </ion-content>
+    </ion-tabs>
   </ion-page>
 </template>
 

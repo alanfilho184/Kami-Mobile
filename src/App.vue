@@ -9,3 +9,9 @@ import NavBar from './components/NavBar.vue';
     <ion-router-outlet />
   </ion-app>
 </template>
+
+<style>
+.tabs-inner {
+  display: none !important;
+}
+</style>
