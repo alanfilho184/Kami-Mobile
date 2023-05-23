@@ -1,6 +1,7 @@
 
 <script>
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonTabs, IonRouterOutlet } from '@ionic/vue';
+import ItemComponent from '../components/ItemComponent.vue'
 
 export default {
   components: {
@@ -10,7 +11,15 @@ export default {
     IonTitle,
     IonToolbar,
     IonTabs,
-    IonRouterOutlet
+    IonRouterOutlet,
+    ItemComponent
+  },
+  data() {
+    return {
+      sheets: [{ sheet_name: 'teste1', href: 'teste1' }, { sheet_name: 'teste2', href: 'teste2' }],
+      campaings: [],
+      notifications: []
+    }
   },
   async beforeMount() {
     const token = await this.$storage.get('token')
@@ -20,6 +29,118 @@ export default {
       this.$router.push({ name: 'Home' })
     }
   },
+  mounted() {
+    //this.$refs['quick-access-sheet-item'].setAttribute('href', this.sheets[0].href)
+    this.$refs['quick-access-sheet-item'].index = 0
+    this.$refs['quick-access-sheet-item'].description = this.sheets[0].sheet_name
+
+    //this.$refs['quick-access-campaing-item'].setAttribute('href', this.campaings[0].href)
+    // this.$refs['quick-access-campaing-item'].index = 0
+    // this.$refs['quick-access-campaing-item'].description = this.campaings[0].campaing_name
+
+    // this.$refs['quick-access-notification-item'].index = 0
+    // this.$refs['quick-access-notification-item'].description = this.notifications[0].notification
+  },
+  methods: {
+    nextCard(card) {
+      if (card == 'sheet') {
+        const actualIndex = this.$refs['quick-access-sheet-item'].index
+
+        if (actualIndex < this.sheets.length - 1) {
+          const nextSheet = this.sheets[parseInt(actualIndex) + 1]
+          this.$refs['quick-access-sheet-item'].index = parseInt(actualIndex) + 1
+
+          this.$refs['quick-access-sheet-item'].description = nextSheet.sheet_name
+          this.$refs['quick-access-sheet-item'].href = nextSheet.href
+        }
+        else {
+          this.$refs['quick-access-sheet-item'].index = 0
+
+          this.$refs['quick-access-sheet-item'].href = this.sheets[0].href
+          this.$refs['quick-access-sheet-item'].description = this.sheets[0].sheet_name
+        }
+      }
+      else if (card == 'campaing') {
+        const actualIndex = this.$refs['quick-access-campaing-item'].index
+
+        if (actualIndex < this.campaings.length - 1) {
+          const nextCampaing = this.campaings[parseInt(actualIndex) + 1]
+          this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) + 1
+          this.$refs['quick-access-campaing-item'].description = nextCampaing.campaing_name
+          this.$refs['quick-access-campaing-item'].href = nextCampaing.href
+        }
+        else {
+          this.$refs['quick-access-campaing-item'].index = 0
+          this.$refs['quick-access-campaing-item'].href = this.campaings[0].href
+          this.$refs['quick-access-campaing-item'].description = this.campaings[0].campaing_name
+        }
+      }
+      else if (card == 'notification') {
+        const actualIndex = this.$refs['quick-access-notification-item'].index
+
+        if (actualIndex < this.notifications.length - 1) {
+          const nextNotification = this.notifications[parseInt(actualIndex) + 1]
+          this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) + 1
+          this.$refs['quick-access-notification-item'].description = nextNotification.notification
+        }
+        else {
+          this.$refs['quick-access-notification-item'].index = 0
+          this.$refs['quick-access-notification-item'].description = this.notifications[0].notification
+        }
+      }
+    },
+    previousCard(card) {
+      if (card == 'sheet') {
+        const actualIndex = this.$refs['quick-access-sheet-item'].index
+
+        if (actualIndex > 0) {
+          const previousSheet = this.sheets[parseInt(actualIndex) - 1]
+          this.$refs['quick-access-sheet-item'].index = parseInt(actualIndex) - 1
+
+          this.$refs['quick-access-sheet-item'].description = previousSheet.sheet_name
+          this.$refs['quick-access-sheet-item'].href = previousSheet.href
+        }
+        else {
+          this.$refs['quick-access-sheet-item'].index = this.sheets.length - 1
+
+          this.$refs['quick-access-sheet-item'].href = this.sheets[this.sheets.length - 1].href
+          this.$refs['quick-access-sheet-item'].description = this.sheets[this.sheets.length - 1].sheet_name
+        }
+      }
+      else if (card == 'campaing') {
+        const actualIndex = this.$refs['quick-access-campaing-item'].index
+
+        if (actualIndex > 0) {
+          const previousCampaing = this.campaings[parseInt(actualIndex) - 1]
+          this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) - 1
+
+          this.$refs['quick-access-campaing-item'].description = previousCampaing.campaing_name
+          this.$refs['quick-access-campaing-item'].href = previousCampaing.href
+        }
+        else {
+          this.$refs['quick-access-campaing-item'].index = this.campaings.length - 1
+
+          this.$refs['quick-access-campaing-item'].href = this.campaings[this.campaings.length - 1].href
+          this.$refs['quick-access-campaing-item'].description = this.campaings[this.campaings.length - 1].campaing_name
+        }
+      }
+      else if (card == 'notification') {
+        const actualIndex = this.$refs['quick-access-notification-item'].index
+
+        if (actualIndex > 0) {
+          const previousNotification = this.notifications[parseInt(actualIndex) - 1]
+          this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) - 1
+
+          this.$refs['quick-access-notification-item'].description = previousNotification.notification
+        }
+        else {
+          this.$refs['quick-access-notification-item'].index = this.notifications.length - 1
+
+          this.$refs['quick-access-notification-item'].description = this.notifications[this.notifications.length - 1].notification
+        }
+      }
+    }
+  }
 }
 </script>
 
@@ -38,10 +159,32 @@ export default {
           <h1>Acesso Rápido</h1>
           <div class="quick-access-item-box">
             <h1>Fichas</h1>
+            <img class="quick-access-next" src="../assets/navigate.svg" @click="nextCard('sheet')" />
+            <img class="quick-access-previous" src="../assets/navigate.svg" @click="previousCard('sheet')" />
+            <div class="quick-access-item-list">
+              <div class="quick-access-item">
+                <ItemComponent index="0" type="1" description="Sheet" href="Sheet" ref="quick-access-sheet-item" />
+              </div>
+            </div>
+          </div>
+          <div class="quick-access-item-box">
+            <h1>Campanhas</h1>
             <img class="quick-access-next" src="../assets/navigate.svg" />
             <img class="quick-access-previous" src="../assets/navigate.svg" />
             <div class="quick-access-item-list">
-              <div class="quick-acecss-item">item 1</div>
+              <div class="quick-access-item">
+                <ItemComponent index="0" type="2" description="Campanha" ref="quick-access-campaing-item" />
+              </div>
+            </div>
+          </div>
+          <div class="quick-access-item-box">
+            <h1>Notificações</h1>
+            <img class="quick-access-next" src="../assets/navigate.svg" />
+            <img class="quick-access-previous" src="../assets/navigate.svg" />
+            <div class="quick-access-item-list">
+              <div class="quick-access-item">
+                <ItemComponent index="0" type="5" description="Notificação" ref="quick-access-notification-item" />
+              </div>
             </div>
           </div>
         </div>
@@ -79,32 +222,32 @@ export default {
   grid-template-areas:
     "title title title"
     "previous item next";
-  width: 100%;
-  height: 14em;
+  width: 97%;
+  height: 12em;
+  margin: 0;
 }
 
-.quick-access-item-box > h1 {
+.quick-access-item-box>h1 {
   grid-area: title;
   font-size: 1.5em;
   text-align: center;
 }
 
-.quick-access-item-box > .quick-access-next {
+.quick-access-item-box>.quick-access-next {
   grid-area: next;
   align-self: center;
   justify-self: center;
 }
 
-/* transform the width and height to fill the grid area */
 .quick-access-next {
   transform: rotate(180deg);
   margin: 0;
   padding: 0;
-  height: 12em !important;
+  height: 8em !important;
   width: 2em !important;
 }
 
-.quick-access-item-box > .quick-access-previous {
+.quick-access-item-box>.quick-access-previous {
   grid-area: previous;
   align-self: center;
   justify-self: center;
@@ -113,7 +256,7 @@ export default {
 .quick-access-previous {
   margin: 0;
   padding: 0;
-  height: 12em !important;
+  height: 8em !important;
   width: 2em !important;
 }
 
@@ -124,5 +267,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 </style>
