@@ -106,10 +106,6 @@ export default {
             <span></span>
 
             <ul id="menu-content">
-                <li><router-link to="/">Início</router-link></li>
-                <li><router-link to="/comandos">Comandos</router-link></li>
-                <li><router-link to="/tutoriais">Tutoriais</router-link></li>
-                <li><router-link to="/convite">Adicione o Kami</router-link></li>
                 <li v-if="!sign || !userLoaded"><router-link to="/login">Login</router-link></li>
                 <li v-else-if="sign && userLoaded">
                     <div class="mobile-sign-menu">
@@ -123,6 +119,7 @@ export default {
                             <router-link to="/fichas">Fichas</router-link>
                             <router-link to="/campanhas">Campanhas</router-link>
                             <router-link to="/macros">Macros</router-link>
+                            <router-link to="/configuracoes">Configurações</router-link>
                             <router-link to="/logout" cancel="true">Sair</router-link>
                         </div>
                     </div>
@@ -193,10 +190,12 @@ export default {
 
 #menu-toggle input {
     display: flex;
-    width: 40px;
-    height: 32px;
+    width: 50px;
+    height: 40px;
     position: absolute;
     cursor: pointer;
+    top: -10px;
+    left: -15px;
     opacity: 0;
     z-index: 2;
 }
@@ -243,14 +242,14 @@ export default {
     position: absolute;
     box-shadow: 0 0 10px var(--kami-background);
     margin: -50px 0 0 -50px;
-    padding: 6em 30px 1em 50px;
+    padding: 3em 20px 1em 50px;
     background-color: var(--kami-primary);
     transform-origin: 0% 0%;
     transform: translate(-100%, 0);
     transition: transform 0.5s cubic-bezier(0.77, 0.2, 0.05, 1.0);
     border-radius: 10px;
     list-style-type: none;
-    width: 15em;
+    width: 12em;
 }
 
 #menu-content li {
@@ -278,24 +277,22 @@ export default {
     height: 100%;
     margin: 0;
     padding: 5px;
-    background-color: var(--kami-background);
-    border-radius: 10px;
 }
 
 .mobile-sign-menu .mobile-user-profile {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: left;
     align-items: center;
     width: 100%;
     height: 100%;
-    margin: 0;
+    margin: 10px;
     padding: 0;
 }
 
 .mobile-sign-menu .mobile-user-profile .mobile-user-avatar {
-    width: 35px;
-    height: 35px;
+    width: 70px;
+    height: 70px;
     border: 2px solid var(--kami-text);
     border-radius: 50%;
     margin: 5px;
@@ -303,8 +300,8 @@ export default {
 }
 
 .mobile-sign-menu .mobile-user-profile .mobile-username {
-    font-size: 1em;
-    max-width: 115px;
+    font-size: 1.2em;
+    max-width: 100%;
     vertical-align: middle;
     white-space: nowrap;
     overflow: hidden;
