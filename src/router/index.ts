@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue'
 import DashboardPageVue from '../views/DashboardPage.vue';
+import SheetsPage from '../views/SheetsPage.vue';
 import LogoutPage from '../views/LogoutPage.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -14,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardPageVue
+  },
+  {
+    path: '/fichas',
+    name: 'Sheets',
+    component: SheetsPage
   },
   {
     path: '/logout',
