@@ -119,7 +119,7 @@ export default {
                             <router-link to="/fichas">Fichas</router-link>
                             <router-link to="/campanhas">Campanhas</router-link>
                             <router-link to="/macros">Macros</router-link>
-                            <router-link to="/configuracoes">Configurações</router-link>
+                            <router-link to="/config">Configurações</router-link>
                             <router-link to="/logout" cancel="true">Sair</router-link>
                         </div>
                     </div>
