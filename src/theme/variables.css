@@ -8,6 +8,7 @@ http://ionicframework.com/docs/theming/ */
   --kami-text: rgb(255, 255, 255);
   --kami-text-secondary: rgba(255, 255, 255, 0.61);
   --kami-background: rgb(35, 39, 42);
+  --kami-background-filter: brightness(0%) invert(13%) sepia(7%) saturate(774%) hue-rotate(163deg) brightness(93%) contrast(93%);
   --kami-background-secondary: rgb(74, 80, 85);
   --kami-cancel: #272635;
 }
@@ -55,7 +56,7 @@ ion-app {
   --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #e04055;
   --ion-color-danger-tint: #ff5b71;
-  
+
   --ion-color-dark: var(--kami-background);
   --ion-color-dark-rgb: 35, 39, 42;
   --ion-color-dark-contrast: var(--kami-text);

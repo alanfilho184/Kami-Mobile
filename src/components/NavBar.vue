@@ -10,8 +10,6 @@ export default {
             signedRoute: false,
             collapsed: false,
             isInHome: false
-
-
         }
     },
     methods: {
@@ -59,6 +57,12 @@ export default {
             }
         }
     },
+    asyncComputed: {
+        async userState() {
+            console.log('teste')
+            return await this.$storage.get('user')
+        }
+    },
     watch: {
         async $route() {
             if (this.$route.name == 'Home') {
@@ -76,6 +80,11 @@ export default {
             }
 
             await this.loadUser()
+
+            this.toggleMenuMobile('close')
+        },
+        async userState() {
+            console.log('teste')
         }
     },
     beforeMount() {

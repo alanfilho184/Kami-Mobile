@@ -4,6 +4,7 @@ import HomePage from '../views/HomePage.vue'
 import DashboardPageVue from '../views/DashboardPage.vue';
 import ConfigPage from '../views/ConfigPage.vue';
 import SheetsPage from '../views/SheetsPage.vue';
+import SheetPage from '../views/SheetPage.vue';
 import LogoutPage from '../views/LogoutPage.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -26,6 +27,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/fichas',
     name: 'Sheets',
     component: SheetsPage
+  },
+  {
+    path: '/fichas/:user/:sheet',
+    name: 'Sheet',
+    component: SheetPage
   },
   {
     path: '/logout',

@@ -1,7 +1,8 @@
 {
-  "name": "Kami-Mobile",
+  "name": "Kami",
   "integrations": {
     "capacitor": {}
   },
   "type": "vue"
+  
 }

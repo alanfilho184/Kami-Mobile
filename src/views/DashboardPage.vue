@@ -16,7 +16,8 @@ export default {
   },
   data() {
     return {
-      sheets: [{ sheet_name: 'teste1', href: 'teste1' }, { sheet_name: 'teste2', href: 'teste2' }],
+      username: '',
+      sheets: [{ sheet_name: 'teste1' }, { sheet_name: 'teste2' }],
       campaings: [],
       notifications: []
     }
@@ -28,11 +29,19 @@ export default {
       await this.$storage.remove('user')
       this.$router.push({ name: 'Home' })
     }
+
+    setTimeout(() => {
+      this.$storage.get('user').then((user) => {
+        this.username = user.username
+      })
+    }, 50)
   },
   mounted() {
-    //this.$refs['quick-access-sheet-item'].setAttribute('href', this.sheets[0].href)
-    this.$refs['quick-access-sheet-item'].index = 0
-    this.$refs['quick-access-sheet-item'].description = this.sheets[0].sheet_name
+    setTimeout(() => {
+      this.$refs['quick-access-sheet-item'].href = `fichas/${this.username}/${this.sheets[0].sheet_name}`
+      this.$refs['quick-access-sheet-item'].description = this.sheets[0].sheet_name
+      this.$refs['quick-access-sheet-item'].index = 0
+    }, 300)
 
     //this.$refs['quick-access-campaing-item'].setAttribute('href', this.campaings[0].href)
     // this.$refs['quick-access-campaing-item'].index = 0
@@ -51,43 +60,43 @@ export default {
           this.$refs['quick-access-sheet-item'].index = parseInt(actualIndex) + 1
 
           this.$refs['quick-access-sheet-item'].description = nextSheet.sheet_name
-          this.$refs['quick-access-sheet-item'].href = nextSheet.href
+          this.$refs['quick-access-sheet-item'].href = `fichas/${this.username}/${nextSheet.sheet_name}`
         }
         else {
           this.$refs['quick-access-sheet-item'].index = 0
 
-          this.$refs['quick-access-sheet-item'].href = this.sheets[0].href
+          this.$refs['quick-access-sheet-item'].href = `fichas/${this.username}/${this.sheets[0].sheet_name}`
           this.$refs['quick-access-sheet-item'].description = this.sheets[0].sheet_name
         }
       }
-      else if (card == 'campaing') {
-        const actualIndex = this.$refs['quick-access-campaing-item'].index
+      // else if (card == 'campaing') {
+      //   const actualIndex = this.$refs['quick-access-campaing-item'].index
 
-        if (actualIndex < this.campaings.length - 1) {
-          const nextCampaing = this.campaings[parseInt(actualIndex) + 1]
-          this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) + 1
-          this.$refs['quick-access-campaing-item'].description = nextCampaing.campaing_name
-          this.$refs['quick-access-campaing-item'].href = nextCampaing.href
-        }
-        else {
-          this.$refs['quick-access-campaing-item'].index = 0
-          this.$refs['quick-access-campaing-item'].href = this.campaings[0].href
-          this.$refs['quick-access-campaing-item'].description = this.campaings[0].campaing_name
-        }
-      }
-      else if (card == 'notification') {
-        const actualIndex = this.$refs['quick-access-notification-item'].index
+      //   if (actualIndex < this.campaings.length - 1) {
+      //     const nextCampaing = this.campaings[parseInt(actualIndex) + 1]
+      //     this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) + 1
+      //     this.$refs['quick-access-campaing-item'].description = nextCampaing.campaing_name
+      //     this.$refs['quick-access-campaing-item'].href = nextCampaing.href
+      //   }
+      //   else {
+      //     this.$refs['quick-access-campaing-item'].index = 0
+      //     this.$refs['quick-access-campaing-item'].href = this.campaings[0].href
+      //     this.$refs['quick-access-campaing-item'].description = this.campaings[0].campaing_name
+      //   }
+      // }
+      // else if (card == 'notification') {
+      //   const actualIndex = this.$refs['quick-access-notification-item'].index
 
-        if (actualIndex < this.notifications.length - 1) {
-          const nextNotification = this.notifications[parseInt(actualIndex) + 1]
-          this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) + 1
-          this.$refs['quick-access-notification-item'].description = nextNotification.notification
-        }
-        else {
-          this.$refs['quick-access-notification-item'].index = 0
-          this.$refs['quick-access-notification-item'].description = this.notifications[0].notification
-        }
-      }
+      //   if (actualIndex < this.notifications.length - 1) {
+      //     const nextNotification = this.notifications[parseInt(actualIndex) + 1]
+      //     this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) + 1
+      //     this.$refs['quick-access-notification-item'].description = nextNotification.notification
+      //   }
+      //   else {
+      //     this.$refs['quick-access-notification-item'].index = 0
+      //     this.$refs['quick-access-notification-item'].description = this.notifications[0].notification
+      //   }
+      // }
     },
     previousCard(card) {
       if (card == 'sheet') {
@@ -98,47 +107,47 @@ export default {
           this.$refs['quick-access-sheet-item'].index = parseInt(actualIndex) - 1
 
           this.$refs['quick-access-sheet-item'].description = previousSheet.sheet_name
-          this.$refs['quick-access-sheet-item'].href = previousSheet.href
+          this.$refs['quick-access-sheet-item'].href = `fichas/${this.username}/${previousSheet.sheet_name}`
         }
         else {
           this.$refs['quick-access-sheet-item'].index = this.sheets.length - 1
 
-          this.$refs['quick-access-sheet-item'].href = this.sheets[this.sheets.length - 1].href
+          this.$refs['quick-access-sheet-item'].href = `fichas/${this.username}/${this.sheets[this.sheets.length - 1].sheet_name}`
           this.$refs['quick-access-sheet-item'].description = this.sheets[this.sheets.length - 1].sheet_name
         }
       }
-      else if (card == 'campaing') {
-        const actualIndex = this.$refs['quick-access-campaing-item'].index
+      // else if (card == 'campaing') {
+      //   const actualIndex = this.$refs['quick-access-campaing-item'].index
 
-        if (actualIndex > 0) {
-          const previousCampaing = this.campaings[parseInt(actualIndex) - 1]
-          this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) - 1
+      //   if (actualIndex > 0) {
+      //     const previousCampaing = this.campaings[parseInt(actualIndex) - 1]
+      //     this.$refs['quick-access-campaing-item'].index = parseInt(actualIndex) - 1
 
-          this.$refs['quick-access-campaing-item'].description = previousCampaing.campaing_name
-          this.$refs['quick-access-campaing-item'].href = previousCampaing.href
-        }
-        else {
-          this.$refs['quick-access-campaing-item'].index = this.campaings.length - 1
+      //     this.$refs['quick-access-campaing-item'].description = previousCampaing.campaing_name
+      //     this.$refs['quick-access-campaing-item'].href = previousCampaing.href
+      //   }
+      //   else {
+      //     this.$refs['quick-access-campaing-item'].index = this.campaings.length - 1
 
-          this.$refs['quick-access-campaing-item'].href = this.campaings[this.campaings.length - 1].href
-          this.$refs['quick-access-campaing-item'].description = this.campaings[this.campaings.length - 1].campaing_name
-        }
-      }
-      else if (card == 'notification') {
-        const actualIndex = this.$refs['quick-access-notification-item'].index
+      //     this.$refs['quick-access-campaing-item'].href = this.campaings[this.campaings.length - 1].href
+      //     this.$refs['quick-access-campaing-item'].description = this.campaings[this.campaings.length - 1].campaing_name
+      //   }
+      // }
+      // else if (card == 'notification') {
+      //   const actualIndex = this.$refs['quick-access-notification-item'].index
 
-        if (actualIndex > 0) {
-          const previousNotification = this.notifications[parseInt(actualIndex) - 1]
-          this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) - 1
+      //   if (actualIndex > 0) {
+      //     const previousNotification = this.notifications[parseInt(actualIndex) - 1]
+      //     this.$refs['quick-access-notification-item'].index = parseInt(actualIndex) - 1
 
-          this.$refs['quick-access-notification-item'].description = previousNotification.notification
-        }
-        else {
-          this.$refs['quick-access-notification-item'].index = this.notifications.length - 1
+      //     this.$refs['quick-access-notification-item'].description = previousNotification.notification
+      //   }
+      //   else {
+      //     this.$refs['quick-access-notification-item'].index = this.notifications.length - 1
 
-          this.$refs['quick-access-notification-item'].description = this.notifications[this.notifications.length - 1].notification
-        }
-      }
+      //     this.$refs['quick-access-notification-item'].description = this.notifications[this.notifications.length - 1].notification
+      //   }
+      // }
     }
   }
 }
@@ -163,17 +172,17 @@ export default {
             <img class="quick-access-previous" src="../assets/navigate.svg" @click="previousCard('sheet')" />
             <div class="quick-access-item-list">
               <div class="quick-access-item">
-                <ItemComponent index="0" type="1" description="Sheet" href="Sheet" ref="quick-access-sheet-item" />
+                <ItemComponent index="0" type="1" href="" ref="quick-access-sheet-item" />
               </div>
             </div>
           </div>
-          <div class="quick-access-item-box">
+          <!-- <div class="quick-access-item-box">
             <h1>Campanhas</h1>
             <img class="quick-access-next" src="../assets/navigate.svg" />
             <img class="quick-access-previous" src="../assets/navigate.svg" />
             <div class="quick-access-item-list">
               <div class="quick-access-item">
-                <ItemComponent index="0" type="2" description="Campanha" ref="quick-access-campaing-item" />
+                <ItemComponent index="0" type="2" ref="quick-access-campaing-item" />
               </div>
             </div>
           </div>
@@ -183,10 +192,10 @@ export default {
             <img class="quick-access-previous" src="../assets/navigate.svg" />
             <div class="quick-access-item-list">
               <div class="quick-access-item">
-                <ItemComponent index="0" type="5" description="Notificação" ref="quick-access-notification-item" />
+                <ItemComponent index="0" type="5" ref="quick-access-notification-item" />
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </ion-content>
     </ion-tabs>

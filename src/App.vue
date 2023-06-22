@@ -58,6 +58,11 @@ export default {
         navBar.toggleMenuMobile('close')
       }
     }, false);
+  },
+  provide() {
+    return {
+      navBar: this.$refs['nav-bar']
+    }
   }
 }
 </script>

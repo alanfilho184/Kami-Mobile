@@ -2,8 +2,8 @@
 export default {
     data() {
         return {
-            title: 'Ficha acessada recentemente',
-            description: 'Item description',
+            title: 'Carregando...',
+            description: 'Carregando...',
             href: null,
             types: {
                 1: 'Ficha',
