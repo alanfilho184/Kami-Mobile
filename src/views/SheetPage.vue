@@ -4,6 +4,8 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonTabs, IonRoute
 import TextComponent from '../components/sheet/TextComponent.vue'
 import NumberComponent from '../components/sheet/NumberComponent.vue'
 import ImageComponent from '../components/sheet/ImageComponent.vue'
+import ListComponent from '../components/sheet/ListComponent.vue'
+import BarComponent from '../components/sheet/BarComponent.vue'
 
 export default {
     components: {
@@ -16,7 +18,9 @@ export default {
         IonRouterOutlet,
         TextComponent,
         NumberComponent,
-        ImageComponent
+        ImageComponent,
+        ListComponent,
+        BarComponent
     },
     data() {
         return {
@@ -68,7 +72,7 @@ export default {
                             })
                             return
                         }
-                        else if(data.sheet.attributes[key].match(/^[0-9]{1,}(?: [0-9]+){0,}$/gim)){
+                        else if (data.sheet.attributes[key].match(/^[0-9]{1,}(?: [0-9]+){0,}$/gim)) {
                             attributes.sections[0].attributes.push({
                                 value: data.sheet.attributes[key],
                                 name: key,
@@ -201,7 +205,7 @@ export default {
                 return component;
             });
 
-            render(createVNode('div', {class: 'sheet-body-components'}, components), this.$refs['sheet-body']);
+            render(createVNode('div', { class: 'sheet-body-components' }, components), this.$refs['sheet-body']);
         }
     },
     watch: {
@@ -210,11 +214,11 @@ export default {
                 this.$refs['section-title'].innerText = this.sheet.attributes.sections[0].name
                 this.$refs['section'].index = 0
 
-                this.loadAttributes()
+                // this.loadAttributes()
             }
         },
         actualSectionIndex: function (val) {
-            this.loadAttributes()
+            // this.loadAttributes()
         }
     },
 }
@@ -239,7 +243,18 @@ export default {
                             <img src="../assets/navigate.svg" class="next-section" @click="nextSection()" />
                         </div>
                         <div class="sheet-body" ref="sheet-body">
-
+                            <div class="sheet-body-components">
+                                <ImageComponent value="https://cdn.discordapp.com/attachments/836291199140102195/1121805691582169259/favicon.png">
+                                </ImageComponent>
+                                <TextComponent title="Nome" value="Alan">
+                                </TextComponent>
+                                <NumberComponent title="Idade" value="19">
+                                </NumberComponent>
+                                <ListComponent title="Equipamentos" value='{"items":[{"name": "Notebook", "quantity":1}, {"name": "Smartphone", "quantity": 1}]}'>
+                                </ListComponent>
+                                <BarComponent title="Sanidade" value='{"actual":35,"max":100}'>
+                                </BarComponent>
+                            </div>
                         </div>
                     </div>
                 </div>
