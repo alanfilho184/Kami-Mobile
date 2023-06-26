@@ -546,7 +546,7 @@ export default {
                     else if (this.sheet.attributes.sections[sectionIndex].attributes[componentIndex].type == 4) {
                         editedComponents[key] = {
                             type: 'bar',
-                            value: JSON.parse(this.sheet.attributes.sections[sectionIndex].attributes[componentIndex].value)
+                            value: JSON.stringify(this.sheet.attributes.sections[sectionIndex].attributes[componentIndex].value)
                         }
                     }
                     else {

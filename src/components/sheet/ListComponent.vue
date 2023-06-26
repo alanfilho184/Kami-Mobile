@@ -123,51 +123,61 @@ export default {
             }
         },
         validateQuantity(index) {
-            const value = this.value.items[index].quantity
+            try {
+                const value = this.value.items[index].quantity
 
-            if (value == '') {
-                this.validationErrors.quantity.indexes[index] = {}
-                this.validationErrors.quantity.indexes[index].state = true
-                this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.empty
+                if (value == '') {
+                    this.validationErrors.quantity.indexes[index] = {}
+                    this.validationErrors.quantity.indexes[index].state = true
+                    this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.empty
+                }
+                else if (value.length > 32) {
+                    this.validationErrors.quantity.indexes[index] = {}
+                    this.validationErrors.quantity.indexes[index].state = true
+                    this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.tooLong
+                }
+                else if (!value.match(/^[0-9]{1,}(?: [0-9]+){0,}$/gim)) {
+                    this.validationErrors.quantity.indexes[index] = {}
+                    this.validationErrors.quantity.indexes[index].state = true
+                    this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.invalidChars
+                }
+                else {
+                    this.validationErrors.quantity.indexes[index] = {}
+                    this.validationErrors.quantity.indexes[index].state = false
+                    this.validationErrors.quantity.indexes[index].actualMessage = ''
+                }
             }
-            else if (value.length > 32) {
-                this.validationErrors.quantity.indexes[index] = {}
-                this.validationErrors.quantity.indexes[index].state = true
-                this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.tooLong
-            }
-            else if (!value.match(/^[0-9]{1,}(?: [0-9]+){0,}$/gim)) {
-                this.validationErrors.quantity.indexes[index] = {}
-                this.validationErrors.quantity.indexes[index].state = true
-                this.validationErrors.quantity.indexes[index].actualMessage = this.validationErrors.quantity.messages.invalidChars
-            }
-            else {
-                this.validationErrors.quantity.indexes[index] = {}
-                this.validationErrors.quantity.indexes[index].state = false
-                this.validationErrors.quantity.indexes[index].actualMessage = ''
+            catch (err) {
+               //ignore
             }
         },
         validateName(index) {
-            const value = this.value.items[index].name
+            try {
+                const value = this.value.items[index].name
 
-            if (value == '') {
-                this.validationErrors.value.indexes[index] = {}
-                this.validationErrors.value.indexes[index].state = true
-                this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.empty
+                if (value == '') {
+                    this.validationErrors.value.indexes[index] = {}
+                    this.validationErrors.value.indexes[index].state = true
+                    this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.empty
+                }
+                else if (value.length > 1024) {
+                    this.validationErrors.value.indexes[index] = {}
+                    this.validationErrors.value.indexes[index].state = true
+                    this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.tooLong
+                }
+                else if (!value.match(/^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]{1,}(?: [a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]+){0,}$/gim)) {
+                    this.validationErrors.value.indexes[index] = {}
+                    this.validationErrors.value.indexes[index].state = true
+                    this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.invalidChars
+                }
+                else {
+                    this.validationErrors.value.indexes[index] = {}
+                    this.validationErrors.value.indexes[index].state = false
+                    this.validationErrors.value.indexes[index].actualMessage = ''
+                }
             }
-            else if (value.length > 1024) {
-                this.validationErrors.value.indexes[index] = {}
-                this.validationErrors.value.indexes[index].state = true
-                this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.tooLong
-            }
-            else if (!value.match(/^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]{1,}(?: [a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]+){0,}$/gim)) {
-                this.validationErrors.value.indexes[index] = {}
-                this.validationErrors.value.indexes[index].state = true
-                this.validationErrors.value.indexes[index].actualMessage = this.validationErrors.value.messages.invalidChars
-            }
-            else {
-                this.validationErrors.value.indexes[index] = {}
-                this.validationErrors.value.indexes[index].state = false
-                this.validationErrors.value.indexes[index].actualMessage = ''
+            catch (err) {
+                //ignore 
             }
         },
         removeItem(index) {
@@ -250,7 +260,7 @@ export default {
                     const errors = {
                         title: this.validationErrors.title,
                         value: this.validationErrors.value,
-                        quantity: this.validationErrors.quantity                        
+                        quantity: this.validationErrors.quantity
                     }
 
                     eventEmitter.emit('invalid-component', this.$refs['list-component'], errors)

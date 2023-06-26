@@ -82,6 +82,12 @@ export default {
 .header {
   border-bottom: 2px solid var(--kami-primary);
   background-color: var(--kami-background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: fit-content;
+  display: block !important;
+  color: var(--kami-text) !important;
 }
 
 .header-title {

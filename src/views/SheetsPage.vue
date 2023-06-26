@@ -232,7 +232,7 @@ export default {
     <ion-page>
         <ion-tabs>
             <ion-router-outlet></ion-router-outlet>
-            <ion-header class="header" collapse="condense">
+            <ion-header class="header">
                 <div class="toolbar">
                     <h1 class="header-title">Fichas</h1>
                 </div>
