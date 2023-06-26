@@ -1,4 +1,6 @@
 <script>
+import { eventEmitter } from '../../utils/EventEmitter.js'
+
 export default {
     data() {
         return {
@@ -36,15 +38,36 @@ export default {
                     },
                     indexes: {}
                 }
-            }
+            },
+            confirmComponentRemove: false
         }
     },
     mounted() {
         this.title = this.$refs['list-component'].getAttribute('title')
 
-        const value = JSON.parse(this.$refs['list-component'].getAttribute('value'))
+        let value = {
+            items: []
+        }
 
-        this.value = value
+        if (this.$refs['list-component'].getAttribute('value') != '') {
+            value = JSON.parse(this.$refs['list-component'].getAttribute('value'))
+
+            this.value = value
+        }
+        else {
+            if (this.$refs['list-component'].getAttribute('editmode') == 'true') {
+                this.value = value
+                this.expanded = true
+
+                setTimeout(() => {
+                    this.toggleEditMode()
+
+                    this.validateTitle()
+                    this.validateName(0)
+                    this.validateQuantity(0)
+                }, 100)
+            }
+        }
 
         let displayItems = []
         if (value.items.length > 3) {
@@ -207,13 +230,43 @@ export default {
             }
 
             this.displayItems = displayItems
+        },
+        removeActualComponent() {
+            eventEmitter.emit('remove-component', this.$refs['list-component'])
+
+            this.$refs['list-component'].remove()
+        }
+    },
+    watch: {
+        title() {
+            eventEmitter.emit('update-component', this.$refs['list-component'], this.title, this.value)
+        },
+        value() {
+            eventEmitter.emit('update-component', this.$refs['list-component'], this.title, this.value)
+        },
+        validationErrors: {
+            handler() {
+                if (this.validationErrors.title.state || this.validationErrors.value.state || this.validationErrors.quantity.state) {
+                    const errors = {
+                        title: this.validationErrors.title,
+                        value: this.validationErrors.value,
+                        quantity: this.validationErrors.quantity                        
+                    }
+
+                    eventEmitter.emit('invalid-component', this.$refs['list-component'], errors)
+                }
+                else {
+                    eventEmitter.emit('valid-component', this.$refs['list-component'])
+                }
+            },
+            deep: true
         }
     }
 }
 </script>
 <template>
     <div class="list-component-wrapper" ref="list-component">
-        <div class="list-component" @click="expanded = true">
+        <div class="list-component" @click="expanded = true;">
             <div class="list-component-title">
                 <h4>{{ title }}</h4>
             </div>
@@ -228,13 +281,22 @@ export default {
         <div class="list-component-expanded" v-if="expanded">
             <div class="list-component-expanded-box">
                 <div class="list-component-expanded-controls">
-                    <button @click="expanded = false">Voltar</button>
+                    <button @click="toggleVisualizeMode(); expanded = false;">Voltar</button>
                     <div class="row">
                         <button class="list-component-expanded-button-active" @click="toggleVisualizeMode()"
                             ref="list-component-toggle-visualize-mode-button">Visualizar</button>
                         <button @click="toggleEditMode()" ref="list-component-toggle-edit-mode-button">Editar</button>
                     </div>
-                    <button v-if="editMode && !visualizeMode">Salvar</button>
+                    <button v-if="editMode && !visualizeMode" @click="confirmComponentRemove = true">Remover
+                        componente</button>
+                    <div class="confirmation-pop-up" v-if="confirmComponentRemove">
+                        <p>Tem certeza que deseja apagar esse componente?</p>
+                        <div class="confirmation-pop-up-buttons">
+                            <button
+                                @click="removeActualComponent(); confirmComponentRemove = false; expanded = false;">Apagar</button>
+                            <button @click="confirmComponentRemove = false">Cancelar</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="list-component-expanded-visualize-body" v-if="visualizeMode && !editMode">
                     <div class="list-component-expanded-title">

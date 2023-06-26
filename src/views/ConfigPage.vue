@@ -290,9 +290,9 @@ export default {
         <ion-tabs>
             <ion-router-outlet></ion-router-outlet>
             <ion-header class="header" collapse="condense">
-                <ion-toolbar>
-                    <ion-title size="large" class="header-title">Configurações</ion-title>
-                </ion-toolbar>
+                <div class="toolbar">
+                    <h1 class="header-title">Configurações</h1>
+                </div>
             </ion-header>
 
             <ion-content :fullscreen="true">
@@ -303,7 +303,8 @@ export default {
                         </div>
                         <div class="config-header" v-else-if="patchingUser && !patchError.state && !patchSuccess">
                             <h1>Carregando...</h1>
-                            <LoadWheel class="loading secondary-loading" v-if="patchingUser && !patchError.state && !patchSuccess" />
+                            <LoadWheel class="loading secondary-loading"
+                                v-if="patchingUser && !patchError.state && !patchSuccess" />
                         </div>
                         <div class="config-header" v-else-if="!patchingUser && !patchError.state && patchSuccess">
                             <h1>Informações atualizadas com sucesso</h1>

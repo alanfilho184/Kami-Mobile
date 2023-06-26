@@ -1,4 +1,6 @@
 <script>
+import { eventEmitter } from '../../utils/EventEmitter.js'
+
 export default {
     data() {
         return {
@@ -28,12 +30,25 @@ export default {
                         invalidChars: 'O valor do atributo não pode conter caracteres especiais',
                     }
                 }
-            }
+            },
+            confirmComponentRemove: false,
         }
     },
     mounted() {
         this.title = this.$refs['text-component'].getAttribute('title')
         this.value = this.$refs['text-component'].getAttribute('value')
+
+        if (this.$refs['text-component'].getAttribute('editmode') == 'true') {
+            this.expanded = true
+
+            setTimeout(() => {
+                this.toggleEditMode()
+
+                this.validateTitle()
+                this.validateValue()
+            }, 100)
+        }
+
         //this.config = JSON.parse(this.$refs.text-component.getAttribute('config'))
     },
     methods: {
@@ -90,6 +105,40 @@ export default {
                 this.validationErrors.value.state = false
                 this.validationErrors.value.actualMessage = ''
             }
+        },
+        removeActualComponent() {
+            eventEmitter.emit('remove-component', this.$refs['text-component'])
+
+            this.$refs['text-component'].remove()
+        }
+    },
+    watch: {
+        title() {
+            eventEmitter.emit('update-component', this.$refs['text-component'], this.title, this.value)
+        },
+        value() {
+            eventEmitter.emit('update-component', this.$refs['text-component'], this.title, this.value)
+        },
+        validationErrors: {
+            handler() {
+                if (this.validationErrors.title.state || this.validationErrors.value.state) {
+                    const errors = {
+                        title: {
+                            state: this.validationErrors.title.state,
+                            actualMessage: this.validationErrors.title.actualMessage
+                        },
+                        value: {
+                            state: this.validationErrors.value.state,
+                            actualMessage: this.validationErrors.value.actualMessage
+                        }
+                    }
+                    eventEmitter.emit('invalid-component', this.$refs['text-component'], errors)
+                }
+                else {
+                    eventEmitter.emit('valid-component', this.$refs['text-component'])
+                }
+            },
+            deep: true
         }
     }
 }
@@ -110,13 +159,22 @@ export default {
         <div class="text-component-expanded" v-if="expanded">
             <div class="text-component-expanded-box">
                 <div class="text-component-expanded-controls">
-                    <button @click="expanded = false">Voltar</button>
+                    <button @click="toggleVisualizeMode(); expanded = false;">Voltar</button>
                     <div class="row">
                         <button class="text-component-expanded-button-active" @click="toggleVisualizeMode()"
                             ref="text-component-toggle-visualize-mode-button">Visualizar</button>
                         <button @click="toggleEditMode()" ref="text-component-toggle-edit-mode-button">Editar</button>
                     </div>
-                    <button v-if="editMode && !visualizeMode">Salvar</button>
+                    <button v-if="editMode && !visualizeMode" @click="confirmComponentRemove = true">Remover
+                        componente</button>
+                    <div class="confirmation-pop-up" v-if="confirmComponentRemove">
+                        <p>Tem certeza que deseja apagar esse componente?</p>
+                        <div class="confirmation-pop-up-buttons">
+                            <button
+                                @click="removeActualComponent(); confirmComponentRemove = false; expanded = false;">Apagar</button>
+                            <button @click="confirmComponentRemove = false">Cancelar</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="text-component-expanded-visualize-body" v-if="visualizeMode && !editMode">
                     <div class="text-component-expanded-title">

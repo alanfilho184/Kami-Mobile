@@ -233,9 +233,9 @@ export default {
         <ion-tabs>
             <ion-router-outlet></ion-router-outlet>
             <ion-header class="header" collapse="condense">
-                <ion-toolbar>
-                    <ion-title size="large" class="header-title">Fichas</ion-title>
-                </ion-toolbar>
+                <div class="toolbar">
+                    <h1 class="header-title">Fichas</h1>
+                </div>
             </ion-header>
 
             <ion-content :fullscreen="true">

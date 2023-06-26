@@ -4,6 +4,7 @@ http://ionicframework.com/docs/theming/ */
 :root {
   font-family: 'Roboto', sans-serif;
   --kami-primary: rgb(0, 105, 206);
+  --kami-primary-filter: brightness(0%) invert(29%) sepia(99%) saturate(1392%) hue-rotate(190deg) brightness(88%) contrast(109%);;
   --kami-secondary: rgb(89, 160, 241);
   --kami-text: rgb(255, 255, 255);
   --kami-text-secondary: rgba(255, 255, 255, 0.61);

@@ -59,7 +59,6 @@ export default {
     },
     asyncComputed: {
         async userState() {
-            console.log('teste')
             return await this.$storage.get('user')
         }
     },

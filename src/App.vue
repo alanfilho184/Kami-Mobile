@@ -78,4 +78,16 @@ export default {
 .tabs-inner {
   display: none !important;
 }
+
+.header {
+  border-bottom: 2px solid var(--kami-primary);
+  background-color: var(--kami-background);
+}
+
+.header-title {
+  font-size: 1.5em;
+  text-align: right;
+  height: 20px;
+  margin-right: 15px;
+}
 </style>

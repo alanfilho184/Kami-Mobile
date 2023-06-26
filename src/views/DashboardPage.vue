@@ -158,9 +158,9 @@ export default {
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-header class="header" collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large" class="header-title">Dashboard</ion-title>
-        </ion-toolbar>
+        <div class="toolbar">
+          <h1 class="header-title">Dashboard</h1>
+        </div>
       </ion-header>
 
       <ion-content :fullscreen="true">
@@ -211,16 +211,6 @@ export default {
   background-color: var(--kami-background);
   width: 100%;
   height: fit-content;
-}
-
-.header {
-  border-bottom: 2px solid var(--kami-primary);
-  background-color: var(--kami-background);
-}
-
-.header-title {
-  font-size: 1.5em;
-  text-align: right;
 }
 
 .quick-access-item-box {

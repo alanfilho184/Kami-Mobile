@@ -1,4 +1,6 @@
 <script>
+import { eventEmitter } from '../../utils/EventEmitter.js'
+
 export default {
     data() {
         return {
@@ -28,12 +30,24 @@ export default {
                         invalidChars: 'O valor do atributo só pode conter números',
                     }
                 }
-            }
+            },
+            confirmComponentRemove: false
         }
     },
     mounted() {
         this.title = this.$refs['number-component'].getAttribute('title')
         this.value = this.$refs['number-component'].getAttribute('value')
+
+        if (this.$refs['number-component'].getAttribute('editmode') == 'true') {
+            this.expanded = true
+
+            setTimeout(() => {
+                this.toggleEditMode()
+
+                this.validateTitle()
+                this.validateValue()
+            }, 100)
+        }
         //this.config = JSON.parse(this.$refs.number-component.getAttribute('config'))
     },
     methods: {
@@ -90,11 +104,18 @@ export default {
                 this.validationErrors.value.state = false
                 this.validationErrors.value.actualMessage = ''
             }
+        },
+        removeActualComponent() {
+            eventEmitter.emit('remove-component', this.$refs['number-component'])
+
+            this.$refs['number-component'].remove()
         }
     },
     watch: {
+        title() {
+            eventEmitter.emit('update-component', this.$refs['number-component'], this.title, this.value)
+        },
         value() {
-            // if value lenght is greater than 3, then font size decreases 0.5em per character
             if (this.value.length > 3 && this.value.length < 6) {
                 this.$refs['number-component'].querySelector('.number-component-value p').style.fontSize = `${5 - (this.value.length - 3) * (0.1 + (0.1 * this.value.length))}em`
             }
@@ -105,6 +126,30 @@ export default {
             else {
                 this.$refs['number-component'].querySelector('.number-component-value p').style.fontSize = `4.5em`
             }
+
+            eventEmitter.emit('update-component', this.$refs['number-component'], this.title, this.value)
+        },
+        validationErrors: {
+            handler() {
+                if (this.validationErrors.title.state || this.validationErrors.value.state) {
+                    const errors = {
+                        title: {
+                            state: this.validationErrors.title.state,
+                            actualMessage: this.validationErrors.title.actualMessage
+                        },
+                        value: {
+                            state: this.validationErrors.value.state,
+                            actualMessage: this.validationErrors.value.actualMessage
+                        }
+                    }
+
+                    eventEmitter.emit('invalid-component', this.$refs['number-component'], errors)
+                }
+                else {
+                    eventEmitter.emit('valid-component', this.$refs['number-component'])
+                }
+            },
+            deep: true
         }
     }
 }
@@ -125,13 +170,22 @@ export default {
         <div class="number-component-expanded" v-if="expanded">
             <div class="number-component-expanded-box">
                 <div class="number-component-expanded-controls">
-                    <button @click="expanded = false">Voltar</button>
+                    <button @click="toggleVisualizeMode(); expanded = false;">Voltar</button>
                     <div class="row">
                         <button class="number-component-expanded-button-active" @click="toggleVisualizeMode()"
                             ref="number-component-toggle-visualize-mode-button">Visualizar</button>
                         <button @click="toggleEditMode()" ref="number-component-toggle-edit-mode-button">Editar</button>
                     </div>
-                    <button v-if="editMode && !visualizeMode">Salvar</button>
+                    <button v-if="editMode && !visualizeMode" @click="confirmComponentRemove = true">Remover
+                        componente</button>
+                    <div class="confirmation-pop-up" v-if="confirmComponentRemove">
+                        <p>Tem certeza que deseja apagar esse componente?</p>
+                        <div class="confirmation-pop-up-buttons">
+                            <button
+                                @click="removeActualComponent(); confirmComponentRemove = false; expanded = false;">Apagar</button>
+                            <button @click="confirmComponentRemove = false">Cancelar</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="number-component-expanded-visualize-body" v-if="visualizeMode && !editMode">
                     <div class="number-component-expanded-title">

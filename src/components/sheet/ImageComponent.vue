@@ -1,8 +1,9 @@
 <script>
+import { eventEmitter } from '../../utils/EventEmitter.js'
+
 export default {
     data() {
         return {
-            title: 'Carregando...',
             value: 'Carregando...',
             config: {},
             expanded: false,
@@ -17,12 +18,23 @@ export default {
                         invalidImageURL: 'O valor do atributo deve ser um URL de imagem válido'
                     }
                 }
-            }
+            },
+            confirmComponentRemove: false
         }
     },
     mounted() {
-        this.title = this.$refs['image-component'].getAttribute('title')
         this.value = this.$refs['image-component'].getAttribute('value')
+
+        if (this.$refs['image-component'].getAttribute('editmode') == 'true') {
+            this.expanded = true
+
+            setTimeout(() => {
+                this.toggleEditMode()
+
+                this.validateValue()
+            }, 100)
+        }
+
         //this.config = JSON.parse(this.$refs.image-component.getAttribute('config'))
     },
     methods: {
@@ -55,6 +67,39 @@ export default {
                 this.validationErrors.value.state = false
                 this.validationErrors.value.actualMessage = ''
             }
+        },
+        removeActualComponent() {
+            eventEmitter.emit('remove-component', this.$refs['image-component'])
+
+            this.$refs['image-component'].remove()
+        }
+    },
+    watch: {
+        title() {
+            eventEmitter.emit('update-component', this.$refs['image-component'], this.title, this.value)
+        },
+        value() {
+            this.validateValue()
+
+            eventEmitter.emit('update-component', this.$refs['image-component'], this.title, this.value)
+        },
+        validationErrors: {
+            handler() {
+                if (this.validationErrors.value.state) {
+                    const errors = {
+                        value: {
+                            state: this.validationErrors.value.state,
+                            actualMessage: this.validationErrors.value.actualMessage
+                        }
+                    }
+
+                    eventEmitter.emit('invalid-component', this.$refs['image-component'], errors)
+                }
+                else {
+                    eventEmitter.emit('valid-component', this.$refs['image-component'])
+                }
+            },
+            deep: true
         }
     }
 }
@@ -74,11 +119,22 @@ export default {
                 <div class="image-component-expanded-controls">
                     <button @click="expanded = false">Voltar</button>
                     <div class="row">
-                        <button :class="visualizeMode ? 'image-component-expanded-button-active' : ''" @click="toggleVisualizeMode()"
+                        <button :class="visualizeMode ? 'image-component-expanded-button-active' : ''"
+                            @click="toggleVisualizeMode()"
                             ref="image-component-toggle-visualize-mode-button">Visualizar</button>
-                        <button :class="editMode ? 'image-component-expanded-button-active' : ''" @click="toggleEditMode()" ref="image-component-toggle-edit-mode-button">Editar</button>
+                        <button :class="editMode ? 'image-component-expanded-button-active' : ''" @click="toggleEditMode()"
+                            ref="image-component-toggle-edit-mode-button">Editar</button>
                     </div>
-                    <button v-if="editMode && !visualizeMode">Salvar</button>
+                    <button v-if="editMode && !visualizeMode" @click="confirmComponentRemove = true">Remover
+                        componente</button>
+                    <div class="confirmation-pop-up" v-if="confirmComponentRemove">
+                        <p>Tem certeza que deseja apagar esse componente?</p>
+                        <div class="confirmation-pop-up-buttons">
+                            <button
+                                @click="removeActualComponent(); confirmComponentRemove = false; expanded = false;">Apagar</button>
+                            <button @click="confirmComponentRemove = false">Cancelar</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="image-component-expanded-visualize-body" v-if="visualizeMode && !editMode">
                     <div class="image-component-expanded-title">

@@ -1,4 +1,6 @@
 <script>
+import { eventEmitter } from '../../utils/EventEmitter.js'
+
 export default {
     data() {
         return {
@@ -6,6 +8,8 @@ export default {
             value: 'Carregando...',
             actual: 100,
             max: 100,
+            min: 0,
+            step: 1,
             config: {},
             expanded: false,
             visualizeMode: true,
@@ -21,23 +25,76 @@ export default {
                         alreadyExists: 'O nome do atributo já existe',
                     }
                 },
-                value: {
+                actual: {
                     state: false,
                     actualMessage: '',
                     messages: {
-                        empty: 'O valor do atributo não pode ser vazio',
-                        tooLong: 'O valor do atributo não pode ter mais de 1024 caracteres',
-                        invalidChars: 'O valor do atributo não pode conter caracteres especiais',
+                        empty: 'O valor atual não pode ser vazio',
+                        biggerThanMax: 'O valor atual não pode ser maior que o valor máximo',
+                        smallerThanMin: 'O valor atual não pode ser menor que o valor mínimo',
+                        invalidChars: 'O valor atual deve conter apenas números inteiros',
+                    }
+                },
+                max: {
+                    state: false,
+                    actualMessage: '',
+                    messages: {
+                        empty: 'O valor máximo não pode ser vazio',
+                        smallerThanActual: 'O valor máximo não pode ser menor que o valor atual',
+                        invalidChars: 'O valor máximo deve conter apenas números inteiros',
+                    }
+                },
+                min: {
+                    state: false,
+                    actualMessage: '',
+                    messages: {
+                        empty: 'O valor mínimo não pode ser vazio',
+                        biggerThanActual: 'O valor mínimo não pode ser maior que o valor atual',
+                        invalidChars: 'O valor mínimo deve conter apenas números inteiros',
+                    }
+                },
+                step: {
+                    state: false,
+                    actualMessage: '',
+                    messages: {
+                        empty: 'O passo não pode ser vazio',
+                        invalidChars: 'O passo deve conter apenas números inteiros',
+                        greaterThanMax: 'O passo não pode ser maior que o valor máximo',
                     }
                 }
-            }
+            },
+            confirmComponentRemove: false
         }
     },
     mounted() {
-        this.title = this.$refs['bar-component'].getAttribute('title')
-        this.value = JSON.parse(this.$refs['bar-component'].getAttribute('value'))
+        try {
+            this.title = this.$refs['bar-component'].getAttribute('title')
+            this.value = JSON.parse(this.$refs['bar-component'].getAttribute('value'))
+            this.actual = this.value.actual
+            this.max = this.value.max
+        }
+        catch (err) {
+            this.value = {
+                actual: 100,
+                max: 100,
+                min: 0,
+                step: 1
+            }
+        }
         this.actual = this.value.actual
         this.max = this.value.max
+        this.min = this.value.min || 0
+        this.step = this.value.step || 1
+
+        if (this.$refs['bar-component'].getAttribute('editmode') == 'true') {
+            this.expanded = true
+
+            setTimeout(() => {
+                this.toggleEditMode()
+
+                this.validateAll()
+            }, 100)
+        }
         //this.config = JSON.parse(this.$refs.bar-component.getAttribute('config'))
     },
     methods: {
@@ -75,25 +132,143 @@ export default {
                 this.validationErrors.title.actualMessage = ''
             }
         },
-        validateValue() {
-            const value = this.value
+        validateActual() {
+            const actual = this.actual
 
-            if (value == '') {
-                this.validationErrors.value.state = true
-                this.validationErrors.value.actualMessage = this.validationErrors.value.messages.empty
+            if (actual.toString() == '') {
+                this.validationErrors.actual.state = true
+                this.validationErrors.actual.actualMessage = this.validationErrors.actual.messages.empty
             }
-            else if (value.length > 1024) {
-                this.validationErrors.value.state = true
-                this.validationErrors.value.actualMessage = this.validationErrors.value.messages.tooLong
+            else if (actual > this.max) {
+                this.validationErrors.actual.state = true
+                this.validationErrors.actual.actualMessage = this.validationErrors.actual.messages.biggerThanMax
             }
-            else if (!value.match(/^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]{1,}(?: [a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ+#@$%&*{}()/.,;:?!'"-_| ]+){0,}$/gim)) {
-                this.validationErrors.value.state = true
-                this.validationErrors.value.actualMessage = this.validationErrors.value.messages.invalidChars
+            else if (actual < this.min) {
+                this.validationErrors.actual.state = true
+                this.validationErrors.actual.actualMessage = this.validationErrors.actual.messages.smallerThanMin
+            }
+            else if (!actual.toString().match(/^[0-9]+$/gim)) {
+                this.validationErrors.actual.state = true
+                this.validationErrors.actual.actualMessage = this.validationErrors.actual.messages.invalidChars
             }
             else {
-                this.validationErrors.value.state = false
-                this.validationErrors.value.actualMessage = ''
+                this.validationErrors.actual.state = false
+                this.validationErrors.actual.actualMessage = ''
             }
+        },
+        validateMax() {
+            const max = this.max
+
+            if (max.toString() == '') {
+                this.validationErrors.max.state = true
+                this.validationErrors.max.actualMessage = this.validationErrors.max.messages.empty
+            }
+            else if (max < this.actual) {
+                this.validationErrors.max.state = true
+                this.validationErrors.max.actualMessage = this.validationErrors.max.messages.smallerThanActual
+            }
+            else if (!max.toString().match(/^[0-9]+$/gim)) {
+                this.validationErrors.max.state = true
+                this.validationErrors.max.actualMessage = this.validationErrors.max.messages.invalidChars
+            }
+            else {
+                this.validationErrors.max.state = false
+                this.validationErrors.max.actualMessage = ''
+            }
+        },
+        validateMin() {
+            const min = this.min
+
+            if (min.toString() == '') {
+                this.validationErrors.min.state = true
+                this.validationErrors.min.actualMessage = this.validationErrors.min.messages.empty
+            }
+            else if (min > this.actual) {
+                this.validationErrors.min.state = true
+                this.validationErrors.min.actualMessage = this.validationErrors.min.messages.biggerThanActual
+            }
+            else if (!min.toString().match(/^[0-9]+$/gim)) {
+                this.validationErrors.min.state = true
+                this.validationErrors.min.actualMessage = this.validationErrors.min.messages.invalidChars
+            }
+            else {
+                this.validationErrors.min.state = false
+                this.validationErrors.min.actualMessage = ''
+            }
+        },
+        validateStep() {
+            const step = this.step
+
+            if (step.toString() == '') {
+                this.validationErrors.step.state = true
+                this.validationErrors.step.actualMessage = this.validationErrors.step.messages.empty
+            }
+            else if (step > this.max) {
+                this.validationErrors.step.state = true
+                this.validationErrors.step.actualMessage = this.validationErrors.step.messages.greaterThanMax
+            }
+            else if (!step.toString().match(/^[0-9]+$/gim)) {
+                this.validationErrors.step.state = true
+                this.validationErrors.step.actualMessage = this.validationErrors.step.messages.invalidChars
+            }
+            else {
+                this.validationErrors.step.state = false
+                this.validationErrors.step.actualMessage = ''
+            }
+        },
+        validateAll() {
+            this.validateTitle()
+            this.validateActual()
+            this.validateMax()
+            this.validateMin()
+            this.validateStep()
+
+            this.updateValue()
+        },
+        updateValue() {
+            this.value = {
+                actual: this.actual,
+                max: this.max,
+                min: this.min,
+                step: this.step
+            }
+        },
+        removeActualComponent() {
+            eventEmitter.emit('remove-component', this.$refs['bar-component'])
+
+            this.$refs['bar-component'].remove()
+        }
+    },
+    watch: {
+        title() {
+            eventEmitter.emit('update-component', this.$refs['bar-component'], this.title, this.value)
+        },
+        value: {
+            handler: function (newValue, oldValue) {
+                this.$refs['bar-component'].setAttribute('value', JSON.stringify(newValue))
+
+                eventEmitter.emit('update-component', this.$refs['bar-component'], this.title, this.value)
+            },
+            deep: true
+        },
+        validationErrors: {
+            handler() {
+                if(this.validationErrors.title.state || this.validationErrors.actual.state || this.validationErrors.max.state || this.validationErrors.min.state || this.validationErrors.step.state) {
+                    const errors = {
+                        title: this.validationErrors.title,
+                        actual: this.validationErrors.actual,
+                        max: this.validationErrors.max,
+                        min: this.validationErrors.min,
+                        step: this.validationErrors.step
+                    }
+
+                    eventEmitter.emit('invalid-component', this.$refs['bar-component'], errors)
+                }
+                else {
+                    eventEmitter.emit('valid-component', this.$refs['bar-component'])
+                }
+            },
+            deep: true
         }
     }
 }
@@ -112,10 +287,10 @@ export default {
             </div>
             <div class="bar-component-controls-display">
                 <div class="bar-component-icon">
-                    <img src="../../assets/plus.svg" @click="actual + 1 > max ? actual : actual += 1" />
+                    <img src="../../assets/plus.svg" @click="actual + step > max ? actual : actual += step; updateValue()" />
                 </div>
                 <div class="bar-component-icon">
-                    <img src="../../assets/minus.svg" @click="actual - 1 < 0 ? actual : actual -= 1" />
+                    <img src="../../assets/minus.svg" @click="actual - step < min ? actual : actual -= step; updateValue()" />
                 </div>
             </div>
         </div>
@@ -128,14 +303,34 @@ export default {
                             ref="bar-component-toggle-visualize-mode-button">Visualizar</button>
                         <button @click="toggleEditMode()" ref="bar-component-toggle-edit-mode-button">Editar</button>
                     </div>
-                    <button v-if="editMode && !visualizeMode">Salvar</button>
+                    <button v-if="editMode && !visualizeMode" @click="confirmComponentRemove = true">Remover
+                        componente</button>
+                    <div class="confirmation-pop-up" v-if="confirmComponentRemove">
+                        <p>Tem certeza que deseja apagar esse componente?</p>
+                        <div class="confirmation-pop-up-buttons">
+                            <button
+                                @click="removeActualComponent(); confirmComponentRemove = false; expanded = false;">Apagar</button>
+                            <button @click="confirmComponentRemove = false">Cancelar</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="bar-component-expanded-visualize-body" v-if="visualizeMode && !editMode">
-                    <div class="bar-component-expanded-title">
+                    <div class="bar-component-title" @click="expanded = true">
                         <h4>{{ title }}</h4>
+                        <h4>{{ actual }}/{{ max }}</h4>
                     </div>
-                    <div class="bar-component-expanded-value">
-                        <p>{{ value }}</p>
+                    <div class="bar-component-value" @click="expanded = true">
+                        <div class="bar-component-outter-bar-display">
+                            <div class="bar-component-inner-bar-display" :style="`width: ${(actual / max) * 100}%`"></div>
+                        </div>
+                    </div>
+                    <div class="bar-component-controls-display">
+                        <div class="bar-component-icon">
+                            <img src="../../assets/plus.svg" @click="actual + step > max ? actual : actual += step; updateValue()" />
+                        </div>
+                        <div class="bar-component-icon">
+                            <img src="../../assets/minus.svg" @click="actual - step < min ? actual : actual -= step; updateValue()" />
+                        </div>
                     </div>
                 </div>
                 <div class="bar-component-expanded-edit-body" v-else-if="!visualizeMode && editMode">
@@ -145,9 +340,18 @@ export default {
                     </div>
                     <div class="bar-component-expanded-value">
                         <p v-if="validationErrors.title.state">{{ validationErrors.title.actualMessage }}</p>
-                        <p v-if="validationErrors.value.state">{{ validationErrors.value.actualMessage }}</p>
-                        <textarea v-model="value" placeholder="Insira um valor para o atributo" @keyup="validateValue()"
-                            @change="validateValue()"></textarea>
+                        <label>Valor mínimo</label>
+                        <input type="number" v-model="min" @keyup="validateAll()" @change="validateAll()">
+                        <p v-if="validationErrors.min.state">{{ validationErrors.min.actualMessage }}</p>
+                        <label>Valor máximo</label>
+                        <input type="number" v-model="max" @keyup="validateAll()" @change="validateAll()">
+                        <p v-if="validationErrors.max.state">{{ validationErrors.max.actualMessage }}</p>
+                        <label>Valor atual</label>
+                        <input type="number" v-model="actual" @keyup="validateAll()" @change="validateAll()">
+                        <p v-if="validationErrors.actual.state">{{ validationErrors.actual.actualMessage }}</p>
+                        <label>Passo dos botões + e -</label>
+                        <input type="number" v-model="step" @keyup="validateAll()" @change="validateAll()">
+                        <p v-if="validationErrors.step.state">{{ validationErrors.step.actualMessage }}</p>
                     </div>
                 </div>
             </div>
@@ -197,7 +401,7 @@ export default {
 }
 
 .bar-component-outter-bar-display {
-    width: 100%;
+    width: 99%;
     height: 1em;
     background-color: var(--kami-primary);
     border-radius: 10px;
@@ -228,7 +432,7 @@ export default {
     margin: 0;
     margin-top: 5px;
     padding: 0;
-    z-index: 1;
+    z-index: 0;
 }
 
 .bar-component-icon {
@@ -430,19 +634,34 @@ export default {
     text-align: center;
 }
 
-.bar-component-expanded-edit-body textarea {
-    width: 95%;
-    height: 50vmax;
+.bar-component-expanded-edit-body .bar-component-expanded-value {
+    width: 100%;
     background-color: var(--kami-primary);
+    padding-top: 5px;
+}
+
+.bar-component-expanded-edit-body .bar-component-expanded-value label {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    ;
     border: none;
-    border-radius: 0 0 10px 10px;
+    color: var(--kami-text);
+}
+
+.bar-component-expanded-edit-body .bar-component-expanded-value input {
+    width: 95%;
+    height: 2em;
+    background-color: var(--kami-background);
+    border: none;
+    border-radius: 10px;
     outline: none;
     color: var(--kami-text);
     font-size: 1.1em;
     font-weight: bold;
     margin: 0;
+    margin-bottom: 5px;
     padding: 5px;
-    text-align: justify;
-    resize: none;
 }
 </style>
