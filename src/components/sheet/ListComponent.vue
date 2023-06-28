@@ -243,8 +243,6 @@ export default {
         },
         removeActualComponent() {
             eventEmitter.emit('remove-component', this.$refs['list-component'])
-
-            this.$refs['list-component'].remove()
         }
     },
     watch: {

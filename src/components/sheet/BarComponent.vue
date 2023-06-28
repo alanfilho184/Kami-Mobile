@@ -235,8 +235,6 @@ export default {
         },
         removeActualComponent() {
             eventEmitter.emit('remove-component', this.$refs['bar-component'])
-
-            this.$refs['bar-component'].remove()
         }
     },
     watch: {

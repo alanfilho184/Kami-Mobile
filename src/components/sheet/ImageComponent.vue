@@ -70,8 +70,6 @@ export default {
         },
         removeActualComponent() {
             eventEmitter.emit('remove-component', this.$refs['image-component'])
-
-            this.$refs['image-component'].remove()
         }
     },
     watch: {

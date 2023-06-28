@@ -108,8 +108,6 @@ export default {
         },
         removeActualComponent() {
             eventEmitter.emit('remove-component', this.$refs['text-component'])
-
-            this.$refs['text-component'].remove()
         }
     },
     watch: {

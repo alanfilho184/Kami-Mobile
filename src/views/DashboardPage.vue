@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       username: '',
-      sheets: [{ sheet_name: 'teste1' }, { sheet_name: 'teste2' }],
+      sheets: [{ sheet_name: 'Demonstracao' }, { sheet_name: 'teste2' }],
       campaings: [],
       notifications: []
     }

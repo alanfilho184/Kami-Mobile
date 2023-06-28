@@ -31,9 +31,7 @@ export default {
         return {
             sheetName: '',
             username: '',
-            sheet: {
-
-            },
+            sheet: {},
             sheetLoaded: false,
             actualSectionIndex: 0,
             sectionExpanded: false,
@@ -512,7 +510,7 @@ export default {
                 })
             }
 
-            if(this.validationErrors.section.state) {
+            if (this.validationErrors.section.state) {
                 errors.push({
                     type: 'section',
                     message: this.validationErrors.section.actualMessage
@@ -638,6 +636,19 @@ export default {
 
                 this.savingSheet = false
             }
+        },
+        reDefinePosition() {
+            this.sheet.attributes.sections.forEach((section, sectionIndex) => {
+                section.position = sectionIndex
+
+                section.attributes.forEach((attribute, attributeIndex) => {
+                    attribute.position = attributeIndex
+                })
+            })
+
+            this.componentsErrorState = {}
+
+            this.loadAttributes()
         }
     },
     watch: {
@@ -661,7 +672,9 @@ export default {
 
             this.sheet.attributes.sections[sectionIndex].attributes.splice(componentIndex, 1)
 
-            this.componentsErrorState[`${sectionIndex}-${componentIndex}`] = undefined
+            delete this.componentsErrorState[`${sectionIndex}-${componentIndex}`]
+
+            this.reDefinePosition()
         })
 
         eventEmitter.on('update-component', (component, title, value) => {
